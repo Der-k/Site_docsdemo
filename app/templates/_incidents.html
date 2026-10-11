@@ -1,0 +1,3 @@
+{% from "components.html" import badge %}
+{% macro severity_badge(s) -%}{{ badge(s, {'High': 'red', 'Medium': 'amber', 'Low': 'green'}[s]) }}{%- endmacro %}
+{% macro incident_status_badge(s) -%}{{ badge({'open': 'Open', 'investigating': 'Investigating', 'closed': 'Closed'}[s], {'open': 'red', 'investigating': 'blue', 'closed': 'slate'}[s]) }}{%- endmacro %}

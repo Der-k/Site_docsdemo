@@ -1,0 +1,27 @@
+{% from "components.html" import badge %}
+{% macro status_badge(status) -%}
+{% set m = {'compliant': ['Compliant', 'green'], 'attention': ['Attention', 'amber'], 'non_compliant': ['Non-compliant', 'red']} %}
+{{ badge(m[status][0], m[status][1]) }}
+{%- endmacro %}
+
+{% macro worker_table(rows, show_site=True) -%}
+<div class="overflow-x-auto">
+<table class="min-w-full text-sm">
+  <thead class="text-left text-xs text-slate-500"><tr class="border-b border-slate-200">
+    <th class="py-2 pr-4 font-medium">Worker</th><th class="py-2 pr-4 font-medium">Job title</th><th class="py-2 pr-4 font-medium">Department</th>
+    {% if show_site %}<th class="py-2 pr-4 font-medium">Site</th>{% endif %}
+    <th class="py-2 pr-4 font-medium">Training</th><th class="py-2 font-medium">Compliance</th></tr></thead>
+  <tbody class="divide-y divide-slate-100">
+    {% for w in rows %}
+    <tr class="hover:bg-slate-50">
+      <td class="py-2 pr-4 font-medium"><a href="/workforce/{{ w.id }}" class="text-slate-900 hover:text-emerald-700 hover:underline">{{ w.name }}</a></td>
+      <td class="py-2 pr-4 text-slate-600">{{ w.job_title }}</td><td class="py-2 pr-4 text-slate-600">{{ w.department }}</td>
+      {% if show_site %}<td class="py-2 pr-4 text-slate-600">{{ w.site_name }}</td>{% endif %}
+      <td class="py-2 pr-4"><div class="flex items-center gap-2"><div class="h-1.5 w-16 rounded bg-slate-200"><div class="h-1.5 rounded bg-emerald-500" style="width: {{ w.training_pct }}%"></div></div><span class="text-xs text-slate-500">{{ w.training_pct }}%</span></div></td>
+      <td class="py-2">{{ status_badge(w.status) }}</td>
+    </tr>
+    {% else %}<tr><td colspan="6" class="py-6 text-center text-slate-500">No workers match these filters.</td></tr>{% endfor %}
+  </tbody>
+</table>
+</div>
+{%- endmacro %}

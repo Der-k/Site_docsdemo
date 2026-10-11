@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% from "components.html" import badge, panel %}
+{% block content %}
+<h2 class="mb-2 text-sm font-semibold text-slate-900">Inspection templates</h2>
+<div class="grid gap-4 md:grid-cols-3">
+  {% for t in templates %}
+  <div class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+    <h3 class="font-semibold text-slate-900">{{ t.title }}</h3>
+    <p class="mt-1 text-sm text-slate-600">{{ t.description }}</p>
+    <p class="mt-2 text-xs text-slate-500">{{ t["items"]|length }} checklist items</p>
+    <a href="/inspections/new?template={{ t.id }}" class="mt-3 inline-block rounded-md bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-emerald-700">Start inspection</a>
+  </div>
+  {% endfor %}
+</div>
+<div class="mt-4">
+{% call panel("Inspections") %}
+<div class="overflow-x-auto"><table class="min-w-full text-sm">
+  <thead class="text-left text-xs text-slate-500"><tr class="border-b border-slate-200"><th class="py-2 pr-4 font-medium">ID</th><th class="py-2 pr-4 font-medium">Inspection</th><th class="py-2 pr-4 font-medium">Site</th><th class="py-2 pr-4 font-medium">Date</th><th class="py-2 pr-4 font-medium">Inspector</th><th class="py-2 font-medium">Result</th></tr></thead>
+  <tbody class="divide-y divide-slate-100">
+    {% for i in inspections %}<tr class="hover:bg-slate-50"><td class="py-2 pr-4"><a href="/inspections/{{ i.id }}" class="font-medium text-emerald-700 hover:underline">{{ i.id }}</a></td>
+      <td class="py-2 pr-4">{{ i.title }}</td><td class="py-2 pr-4 text-slate-600">{{ i.site_name }}</td><td class="py-2 pr-4 text-slate-600">{{ i.date }}</td><td class="py-2 pr-4 text-slate-600">{{ i.inspector }}</td>
+      <td class="py-2">{% if i.fail_count %}{{ badge(i.fail_count ~ (" finding" if i.fail_count == 1 else " findings"), "red") }}{% else %}{{ badge("Passed", "green") }}{% endif %}</td></tr>{% endfor %}
+  </tbody></table></div>
+{% endcall %}
+</div>
+{% endblock %}

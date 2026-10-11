@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% from "components.html" import badge, stat_card, panel %}
+{% block content %}
+<div class="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-6">
+  {{ stat_card("Total workers", stats.workers, "Across all sites", "blue", "/workforce") }}
+  {{ stat_card("Active sites", stats.sites, "Currently operating", "blue", "/sites") }}
+  {{ stat_card("Training completion", stats.training ~ "%", "Required inductions done", "green" if stats.training >= 80 else "amber", "/inductions") }}
+  {{ stat_card("Expiring certifications", stats.expiring, stats.expired ~ " already expired", "amber" if stats.expiring else "green", "/workforce") }}
+  {{ stat_card("Open incidents", stats.open_incidents, "Open or investigating", "red" if stats.open_incidents else "green", "/incidents") }}
+  {{ stat_card("Outstanding actions", stats.outstanding, stats.overdue ~ " overdue", "red" if stats.overdue else "green", "/actions") }}
+</div>
+
+<div class="mt-4 grid gap-4 lg:grid-cols-5">
+  <div class="lg:col-span-3">
+    {% call panel("Incident trend, last 6 months", "/incidents", "View incidents") %}
+    <div class="flex h-40 items-end gap-3" role="img" aria-label="Incidents per month">
+      {% for m in trend %}
+      <div class="flex h-full flex-1 flex-col items-center justify-end gap-1">
+        <span class="text-xs font-medium text-slate-600">{{ m.count }}</span>
+        <div class="w-full max-w-12 rounded-t bg-emerald-500" style="height: {{ [m.pct, 3]|max }}%"></div>
+        <span class="text-xs text-slate-500">{{ m.label }}</span>
+      </div>
+      {% endfor %}
+    </div>
+    {% endcall %}
+  </div>
+  <div class="lg:col-span-2">
+    {% call panel("Upcoming certification expiries", "/workforce", "View workforce") %}
+    <ul class="divide-y divide-slate-100 text-sm">
+      {% for c in expiries %}
+      <li class="flex items-center justify-between gap-2 py-2">
+        <div class="min-w-0"><div class="truncate font-medium text-slate-800">{{ c.worker }}</div><div class="truncate text-xs text-slate-500">{{ c.name }}</div></div>
+        {% if c.days < 0 %}{{ badge("Expired " ~ (-c.days) ~ "d ago", "red") }}{% else %}{{ badge("In " ~ c.days ~ "d", "amber") }}{% endif %}
+      </li>
+      {% else %}<li class="py-2 text-slate-500">No certifications expiring soon.</li>{% endfor %}
+    </ul>
+    {% endcall %}
+  </div>
+</div>
+
+<div class="mt-4 grid gap-4 lg:grid-cols-2">
+  {% call panel("Recent incidents", "/incidents", "All incidents") %}
+  <ul class="divide-y divide-slate-100 text-sm">
+    {% for i in incidents %}
+    <li class="flex items-start justify-between gap-3 py-2">
+      <div class="min-w-0"><a href="/incidents/{{ i.id }}" class="font-medium text-slate-800 hover:text-emerald-700 hover:underline">{{ i.title }}</a><div class="text-xs text-slate-500">{{ site_names[i.site_id] }} - {{ i.date }}</div></div>
+      <div class="flex shrink-0 gap-1">{{ badge(i.severity, {'High': 'red', 'Medium': 'amber', 'Low': 'green'}[i.severity]) }}{{ badge(i.status|replace('_', ' ')|capitalize, 'slate' if i.status == 'closed' else 'blue') }}</div>
+    </li>
+    {% endfor %}
+  </ul>
+  {% endcall %}
+  {% call panel("Recent activity") %}
+  <ul class="space-y-3 text-sm">
+    {% for a in activity %}
+    <li class="flex gap-3"><span class="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-emerald-500"></span>
+      <div><div class="text-slate-800">{{ a.text }}</div><div class="text-xs text-slate-500">{{ a.ago }}</div></div></li>
+    {% endfor %}
+  </ul>
+  {% endcall %}
+</div>
+{% endblock %}

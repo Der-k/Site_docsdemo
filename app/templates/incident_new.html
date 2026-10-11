@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<form method="post" action="/incidents" class="mx-auto max-w-3xl space-y-4 rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+  <label class="block text-xs font-medium text-slate-600">Title<input name="title" required class="mt-1 block w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm"></label>
+  <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+    <label class="text-xs font-medium text-slate-600">Type<select name="type" class="mt-1 block w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm">{% for t in types %}<option>{{ t }}</option>{% endfor %}</select></label>
+    <label class="text-xs font-medium text-slate-600">Severity<select name="severity" class="mt-1 block w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm">{% for s in severities %}<option {{ 'selected' if s == 'Medium' }}>{{ s }}</option>{% endfor %}</select></label>
+    <label class="text-xs font-medium text-slate-600">Site<select name="site_id" class="mt-1 block w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm">{% for s in sites %}<option value="{{ s.id }}">{{ s.name }}</option>{% endfor %}</select></label>
+    <label class="text-xs font-medium text-slate-600">Date of incident<input type="date" name="incident_date" value="{{ today }}" max="{{ today }}" required class="mt-1 block w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm"></label>
+    <label class="text-xs font-medium text-slate-600">Reported by<input name="reporter" value="{{ user.name }}" class="mt-1 block w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm"></label>
+  </div>
+  <label class="block text-xs font-medium text-slate-600">Description<textarea name="description" rows="4" required class="mt-1 block w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm"></textarea></label>
+  <div class="flex gap-3"><button class="rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700">Submit report</button>
+    <a href="/incidents" class="py-2 text-sm text-slate-600 hover:underline">Cancel</a></div>
+</form>
+{% endblock %}

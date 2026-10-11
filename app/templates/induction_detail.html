@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% from "components.html" import badge, panel %}
+{% block content %}
+<div class="grid gap-4 lg:grid-cols-3">
+  <div class="space-y-4 lg:col-span-1">
+    {% call panel("About this induction") %}
+    <p class="text-sm text-slate-600">{{ ind.summary }}</p>
+    <dl class="mt-3 grid grid-cols-3 gap-y-1 text-sm">
+      <dt class="text-slate-500">Duration</dt><dd class="col-span-2">{{ ind.duration_min }} minutes</dd>
+      <dt class="text-slate-500">Sections</dt><dd class="col-span-2">{{ ind.sections|length }}</dd>
+      <dt class="text-slate-500">Quiz</dt><dd class="col-span-2">{{ ind.quiz|length }} questions, pass mark {{ ind.pass_mark }}%</dd>
+      <dt class="text-slate-500">Required at</dt><dd class="col-span-2">{{ ind.site_names|join(', ') }}</dd>
+    </dl>
+    {% endcall %}
+    {% call panel("Start the induction") %}
+    <form method="get" action="/inductions/{{ ind.id }}/take" class="space-y-3">
+      <label class="block text-xs font-medium text-slate-600">Who is taking it?
+        <select name="worker" required class="mt-1 block w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm"><option value="">Choose a worker</option>
+          {% for w in workers %}<option value="{{ w.id }}" {{ 'selected' if w.id == selected }}>{{ w.name }}</option>{% endfor %}</select></label>
+      <button class="rounded-md bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-emerald-700">Start induction</button>
+    </form>
+    {% endcall %}
+  </div>
+  <div class="lg:col-span-2">
+    {% call panel("Completion status", None, None) %}
+    <table class="min-w-full text-sm"><thead class="text-left text-xs text-slate-500"><tr class="border-b border-slate-200"><th class="py-2 font-medium">Worker</th><th class="py-2 font-medium">Site</th><th class="py-2 font-medium">Status</th><th></th></tr></thead>
+      <tbody class="divide-y divide-slate-100">
+        {% for r in ind.roster %}<tr><td class="py-2"><a href="/workforce/{{ r.worker.id }}" class="font-medium hover:underline">{{ r.worker.name }}</a></td><td class="py-2 text-slate-600">{{ r.worker.site_name }}</td>
+          <td class="py-2">{% if r.record %}{{ badge("Completed " ~ r.record.completed_on, "green") }}{% else %}{{ badge("Not completed", "amber") }}{% endif %}</td>
+          <td class="py-2 text-right">{% if r.record %}<a href="/inductions/{{ ind.id }}/certificate/{{ r.worker.id }}" class="text-xs text-emerald-700 hover:underline">Record</a>{% else %}<a href="/inductions/{{ ind.id }}/take?worker={{ r.worker.id }}" class="text-xs font-medium text-emerald-700 hover:underline">Start</a>{% endif %}</td></tr>
+        {% endfor %}
+      </tbody></table>
+    {% endcall %}
+  </div>
+</div>
+{% endblock %}

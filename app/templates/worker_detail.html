@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% from "components.html" import badge, panel %}
+{% from "_workforce.html" import status_badge %}
+{% block heading %}{{ w.name }} {{ status_badge(w.status) }}{% endblock %}
+{% block content %}
+<div class="grid gap-4 lg:grid-cols-3">
+  <div class="space-y-4 lg:col-span-1">
+    {% call panel("Profile") %}
+    <dl class="grid grid-cols-3 gap-y-2 text-sm">
+      <dt class="text-slate-500">Job title</dt><dd class="col-span-2">{{ w.job_title }}</dd>
+      <dt class="text-slate-500">Department</dt><dd class="col-span-2">{{ w.department }}</dd>
+      <dt class="text-slate-500">Site</dt><dd class="col-span-2"><a href="/sites/{{ w.site_id }}" class="text-emerald-700 hover:underline">{{ w.site_name }}</a></dd>
+      <dt class="text-slate-500">Training</dt><dd class="col-span-2">{{ w.training_pct }}% complete</dd>
+    </dl>
+    {% endcall %}
+    {% call panel("Assign to a site") %}
+    <form method="post" action="/workforce/{{ w.id }}/assign" class="flex gap-2">
+      <select name="site_id" aria-label="Site" class="min-w-0 flex-1 rounded-md border border-slate-300 px-2 py-1.5 text-sm">
+        {% for s in sites %}<option value="{{ s.id }}" {{ 'selected' if s.id == w.site_id }}>{{ s.name }}</option>{% endfor %}</select>
+      <button class="rounded-md bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-emerald-700">Assign site</button>
+    </form>
+    <p class="mt-2 text-xs text-slate-500">Required inductions change with the site.</p>
+    {% endcall %}
+  </div>
+  <div class="space-y-4 lg:col-span-2">
+    {% call panel("Required inductions", "/inductions", "Inductions & Training") %}
+    <ul class="divide-y divide-slate-100 text-sm">
+      {% for i in w.required %}
+      <li class="flex items-center justify-between gap-3 py-2">
+        <span>{{ i.title }}</span>
+        {% if i.record %}<span class="text-xs text-slate-500">Completed {{ i.record.completed_on }}, score {{ i.record.score }}% - <a href="/inductions/{{ i.id }}/certificate/{{ w.id }}" class="font-medium text-emerald-700 hover:underline">Certificate</a></span>{{ badge("Completed", "green") }}
+        {% else %}<a href="/inductions/{{ i.id }}/take?worker={{ w.id }}" class="text-xs font-medium text-emerald-700 hover:underline">Start induction</a>{{ badge("Not completed", "amber") }}{% endif %}
+      </li>
+      {% else %}<li class="py-2 text-slate-500">No inductions required for this site.</li>{% endfor %}
+    </ul>
+    {% endcall %}
+    {% call panel("Certifications") %}
+    <table class="min-w-full text-sm">
+      <thead class="text-left text-xs text-slate-500"><tr class="border-b border-slate-200"><th class="py-2 font-medium">Certificate</th><th class="py-2 font-medium">Expires</th><th class="py-2 font-medium">Status</th></tr></thead>
+      <tbody class="divide-y divide-slate-100">
+        {% for c in w.certs|sort(attribute='expires') %}
+        <tr><td class="py-2">{{ c.name }}</td><td class="py-2 text-slate-600">{{ c.expires }}</td>
+          <td class="py-2">{% if c.state == 'expired' %}{{ badge("Expired " ~ (-c.days) ~ "d ago", "red") }}{% elif c.state == 'expiring' %}{{ badge("Expires in " ~ c.days ~ "d", "amber") }}{% else %}{{ badge("Valid", "green") }}{% endif %}</td></tr>
+        {% else %}<tr><td colspan="3" class="py-4 text-slate-500">No certifications on record.</td></tr>{% endfor %}
+      </tbody>
+    </table>
+    {% endcall %}
+  </div>
+</div>
+{% endblock %}

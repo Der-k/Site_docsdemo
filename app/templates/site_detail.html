@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% from "components.html" import badge, panel, stat_card %}
+{% from "_workforce.html" import worker_table %}
+{% block heading %}{{ s.name }} {{ badge(s.label ~ " " ~ s.pct ~ "%", s.tone) }}{% endblock %}
+{% block content %}
+<p class="-mt-3 mb-4 text-sm text-slate-500">{{ s.location }} - Project manager: {{ s.manager }}</p>
+<div class="grid grid-cols-2 gap-3 lg:grid-cols-4">
+  {{ stat_card("Assigned workers", s.worker_count, "On this site", "blue", "/workforce?site=" ~ s.id) }}
+  {{ stat_card("Compliant", s.counts.compliant, "Workers fully compliant", "green", "/workforce?site=" ~ s.id ~ "&status=compliant") }}
+  {{ stat_card("Attention", s.counts.attention, "Expiring or training due", "amber", "/workforce?site=" ~ s.id ~ "&status=attention") }}
+  {{ stat_card("Non-compliant", s.counts.non_compliant, "Expired or no site induction", "red", "/workforce?site=" ~ s.id ~ "&status=non_compliant") }}
+</div>
+<div class="mt-4 space-y-4">
+  {% call panel("Required inductions", "/inductions", "Inductions & Training") %}
+  <ul class="divide-y divide-slate-100 text-sm">
+    {% for i in s.required %}
+    <li class="flex items-center justify-between gap-3 py-2"><span>{{ i.title }}</span>
+      {{ badge(i.done ~ " of " ~ i.total ~ " completed", "green" if i.done == i.total else "amber") }}</li>
+    {% endfor %}
+  </ul>
+  {% endcall %}
+  {% call panel("Assigned workforce") %}{{ worker_table(s.workers, show_site=False) }}{% endcall %}
+</div>
+{% endblock %}

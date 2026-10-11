@@ -1,0 +1,5 @@
+{% from "components.html" import badge %}
+{% macro priority_badge(p) -%}{{ badge(p, {'High': 'red', 'Medium': 'amber', 'Low': 'green'}[p]) }}{%- endmacro %}
+{% macro status_badge(s) -%}
+{{ badge({'open': 'Open', 'in_progress': 'In progress', 'completed': 'Completed'}[s], {'open': 'blue', 'in_progress': 'amber', 'completed': 'green'}[s]) }}
+{%- endmacro %}

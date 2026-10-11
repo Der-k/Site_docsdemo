@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% from "components.html" import panel %}
+{% block content %}
+<div class="grid gap-4 lg:grid-cols-2">
+  {% call panel("Demo data") %}
+  <p class="text-sm text-slate-600">Restores the original sample dataset (workers, sites, inductions, inspections, incidents, actions) and clears the assistant conversation. Do this before each presentation.</p>
+  <form method="post" action="/demo/reset" data-confirm="Reset all demo data to the original sample dataset?" class="mt-3">
+    <button class="rounded-md bg-red-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-red-700">Reset demo data</button></form>
+  {% endcall %}
+  {% call panel("About this demo") %}
+  <dl class="grid grid-cols-3 gap-y-2 text-sm">
+    <dt class="text-slate-500">Purpose</dt><dd class="col-span-2">Presentation prototype. All people and projects are fictional.</dd>
+    <dt class="text-slate-500">Stack</dt><dd class="col-span-2">FastAPI, Jinja2, Tailwind (CDN), JSON file storage</dd>
+    <dt class="text-slate-500">Data file</dt><dd class="col-span-2 break-all">{{ data_file }}</dd>
+    <dt class="text-slate-500">AI assistant</dt><dd class="col-span-2">{% if provider == 'groq' %}Groq ({{ model }}). Changes still need your confirmation.{% else %}Demo mode (keyword matching).{% endif %}</dd>
+    <dt class="text-slate-500">Password gate</dt><dd class="col-span-2">{{ 'On (shared demo password)' if gate_on else 'Off. Set DEMO_PASSWORD before putting this online.' }}</dd>
+    <dt class="text-slate-500">Groq API key</dt><dd class="col-span-2">{{ 'Configured' if key_set else 'Not set. Add GROQ_API_KEY to the .env file and restart.' }}</dd>
+  </dl>
+  {% endcall %}
+</div>
+{% endblock %}

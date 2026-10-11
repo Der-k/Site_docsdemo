@@ -1,0 +1,24 @@
+{% macro badge(text, tone='slate') -%}
+{% set tones = {'green': 'bg-emerald-50 text-emerald-700 ring-emerald-600/20', 'amber': 'bg-amber-50 text-amber-800 ring-amber-600/20',
+  'red': 'bg-red-50 text-red-700 ring-red-600/20', 'blue': 'bg-blue-50 text-blue-700 ring-blue-600/20', 'slate': 'bg-slate-100 text-slate-700 ring-slate-500/20'} %}
+<span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset {{ tones[tone] }}">{{ text }}</span>
+{%- endmacro %}
+
+{% macro stat_card(label, value, hint, tone='slate', href='#') -%}
+{% set bar = {'green': 'border-emerald-500', 'amber': 'border-amber-500', 'red': 'border-red-500', 'blue': 'border-blue-500', 'slate': 'border-slate-300'} %}
+<a href="{{ href }}" class="block rounded-lg border border-slate-200 border-l-4 {{ bar[tone] }} bg-white p-4 shadow-sm hover:border-slate-300 hover:shadow">
+  <div class="text-xs font-medium text-slate-500">{{ label }}</div>
+  <div class="mt-1 text-2xl font-semibold text-slate-900">{{ value }}</div>
+  <div class="mt-1 text-xs text-slate-500">{{ hint }}</div>
+</a>
+{%- endmacro %}
+
+{% macro panel(title, link_href=None, link_text=None) -%}
+<section class="rounded-lg border border-slate-200 bg-white shadow-sm">
+  <header class="flex items-center justify-between border-b border-slate-100 px-4 py-3">
+    <h2 class="text-sm font-semibold text-slate-900">{{ title }}</h2>
+    {% if link_href %}<a href="{{ link_href }}" class="text-xs font-medium text-emerald-700 hover:underline">{{ link_text }}</a>{% endif %}
+  </header>
+  <div class="p-4">{{ caller() }}</div>
+</section>
+{%- endmacro %}
